@@ -1,0 +1,7 @@
+resnet_model.py定义了resnet50和剪枝的resnet50模型
+在train.py中调用
+requirment:
+tensorlfow>=2.0
+tensorboard
+numpy
+tensorflow_model_optimization
