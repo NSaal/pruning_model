@@ -1,0 +1,4 @@
+tensorlfow-gpu>=2.0
+tensorboard
+numpy
+tensorflow_model_optimization
