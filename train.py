@@ -1,5 +1,6 @@
 import numpy as np
-from resnet_model import resnet50,pruing_resnet50
+from model.resnet50 import resnet50,pruing_resnet50
+from model.vgg16 import vgg16
 import os
 import zipfile
 import tempfile
@@ -17,6 +18,7 @@ img_rows, img_cols = 28, 28
 
 # the data, shuffled and split between train and test sets
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+
 
 if tf.keras.backend.image_data_format() == 'channels_first':
   x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
@@ -112,9 +114,38 @@ def train_resnet50():
     tf.keras.models.save_model(
         pruning_model, checkpoint_file, include_optimizer=False)
 
+
+def train_vgg16():
+    model = vgg16(10)
+    model.summary()
+    logdir = ".//logs"
+    callbacks = [tf.keras.callbacks.TensorBoard(
+        log_dir=logdir, profile_batch=0)]
+
+    model.compile(
+        loss=tf.keras.losses.categorical_crossentropy,
+        optimizer='adam',
+        metrics=['accuracy'])
+
+    model.fit(x_train, y_train,
+              batch_size=batch_size,
+              epochs=epochs,
+              verbose=1,
+              callbacks=callbacks,
+              validation_data=(x_test, y_test))
+    score = model.evaluate(x_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+
+    checkpoint_file = ".//save//resnet50_withoutopti.h5"
+    print('Saving pruned model to: ', checkpoint_file)
+    tf.keras.models.save_model(
+        pruning_model, checkpoint_file, include_optimizer=False)
+
 def main():
-    train_resnet50()
+    #train_resnet50()
     #train_pruned_resnet50()
+    train_vgg16()
 
 if __name__ == "__main__":
     main()
